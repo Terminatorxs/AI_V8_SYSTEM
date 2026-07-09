@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>EdgeVision AI Security Platform</title>
+
+<link rel="stylesheet" href="/static/css/style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+.video-shell{
+    width:100%;
+    height:78vh;
+    background:#000;
+    border-radius:14px;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+#videoStream{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:2.2fr 1fr;
+    gap:18px;
+}
+
+.video-panel{
+    width:100%;
+}
+
+.side-panel{
+    height:78vh;
+    overflow-y:auto;
+}
+
+.video-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.fullscreen-btn{
+    background:#1f8efa;
+    color:white;
+    border:none;
+    padding:6px 18px;
+    border-radius:20px;
+    cursor:pointer;
+}
+
+.face-btn{
+    width:100%;
+    margin-top:14px;
+    padding:12px 16px;
+    border:none;
+    border-radius:12px;
+    background:#16a34a;
+    color:white;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.face-btn:hover{
+    background:#15803d;
+}
+
+.face-tip{
+    margin-top:8px;
+    font-size:13px;
+    color:#9ca3af;
+    line-height:1.5;
+}
+
+@media(max-width:1200px){
+
+    .dashboard-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="topbar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            🛡
+        </div>
+
+        <div>
+
+            <div class="brand-title">
+                EdgeVision AI Security Platform
+            </div>
+
+            <div class="brand-subtitle">
+                RK3588 Edge AI · Multi-Scene Intelligent Surveillance
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="top-right">
+
+        <span id="clock">
+            --:--:--
+        </span>
+
+        <span class="online-dot"></span>
+
+        <span id="system">
+            ONLINE
+        </span>
+
+        <a href="/logout">
+            退出
+        </a>
+
+    </div>
+
+</div>
+
+
+<div class="layout">
+
+<aside class="sidebar">
+
+    <a onclick="changeScene('dashboard')" class="scene-btn">
+        🏠 控制中心
+    </a>
+
+    <a onclick="changeScene('mall')" class="scene-btn">
+        🏬 商场模式
+    </a>
+
+    <a onclick="changeScene('restricted')" class="scene-btn">
+        🚨 禁区模式
+    </a>
+
+    <a onclick="changeScene('campus')" class="scene-btn">
+        🏫 校园模式
+    </a>
+
+    <a onclick="changeScene('factory')" class="scene-btn">
+        🏭 工厂模式
+    </a>
+
+    <a onclick="changeScene('parking')" class="scene-btn">
+        🚗 停车场
+    </a>
+
+    <a onclick="changeScene('warehouse')" class="scene-btn">
+        📦 仓库模式
+    </a>
+
+    <a onclick="changeScene('home')" class="scene-btn">
+        🏠 家庭模式
+    </a>
+
+</aside>
+
+
+<main class="main">
+
+<section class="hero">
+
+    <div>
+
+        <h1 id="sceneTitle">
+            AI 安防控制中心
+        </h1>
+
+        <p id="sceneDesc">
+            综合监控系统
+        </p>
+
+    </div>
+
+    <div class="mode-badge" id="sceneBadge">
+        当前模式：综合模式
+    </div>
+
+</section>
+
+
+<section class="cards">
+
+    <div class="card">
+
+        <span>当前人数</span>
+
+        <strong id="people">
+            0
+        </strong>
+
+        <em>People Count</em>
+
+    </div>
+
+    <div class="card">
+
+        <span>今日进入</span>
+
+        <strong id="inCount">
+            0
+        </strong>
+
+        <em>IN</em>
+
+    </div>
+
+    <div class="card">
+
+        <span>今日离开</span>
+
+        <strong id="outCount">
+            0
+        </strong>
+
+        <em>OUT</em>
+
+    </div>
+
+    <div class="card">
+
+        <span>报警等级</span>
+
+        <strong id="alarm">
+            LOW
+        </strong>
+
+        <em>Alarm Level</em>
+
+    </div>
+
+</section>
+
+
+<section class="dashboard-grid">
+
+    <div class="video-panel">
+
+        <div class="video-header">
+
+            <h2 id="videoTitle">
+                实时监控画面
+            </h2>
+
+            <div>
+
+                <span>
+                    LIVE
+                </span>
+
+                <button
+                    class="fullscreen-btn"
+                    id="fullscreenBtn">
+                    ⛶ 全屏
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="video-shell">
+
+            <img
+                id="videoStream"
+                src="/video"
+            >
+
+        </div>
+
+    </div>
+
+
+    <div class="side-panel">
+
+        <div class="panel-title">
+
+            <h2>
+                系统状态
+            </h2>
+
+        </div>
+
+        <div class="alert-box" id="alertBox">
+            ✅ 系统正常运行
+        </div>
+
+        <button class="face-btn" onclick="registerFace()">
+            👤 录入家庭白名单
+        </button>
+
+        <div class="face-tip" id="faceTip">
+            家庭模式下，点击按钮可将当前摄像头画面中的人脸录入白名单。
+        </div>
+
+        <div class="event-box">
+
+            <h3>
+                事件记录
+            </h3>
+
+            <ul id="eventList">
+            </ul>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="bottom-grid">
+
+    <div class="chart-panel">
+
+        <canvas id="peopleChart">
+        </canvas>
+
+    </div>
+
+    <div class="scene-panel">
+
+        <div class="info-list">
+
+            <div>
+
+                <span>
+                    系统
+                </span>
+
+                <b id="system2">
+                    ONLINE
+                </b>
+
+            </div>
+
+            <div>
+
+                <span>
+                    模型
+                </span>
+
+                <b>
+                    RKNN-YOLO11n
+                </b>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<script>
+
+// ======================
+// 当前场景
+// ======================
+
+let currentScene = "dashboard";
+
+
+// ======================
+// 时钟
+// ======================
+
+function updateClock(){
+
+    document.getElementById("clock").innerHTML =
+        new Date().toLocaleString();
+
+}
+
+
+// ======================
+// 场景配置
+// ======================
+
+const scenes={
+
+    dashboard:{
+
+        title:"AI 安防控制中心",
+
+        desc:"综合监控系统",
+
+        badge:"综合模式"
+
+    },
+
+    mall:{
+
+        title:"商场客流分析",
+
+        desc:"人数统计 · 客流分析",
+
+        badge:"商场模式"
+
+    },
+
+    restricted:{
+
+        title:"禁区入侵检测中心",
+
+        desc:"区域入侵检测 · 高危报警",
+
+        badge:"禁区模式"
+
+    },
+
+    campus:{
+
+        title:"校园安防系统",
+
+        desc:"人员检测 · 聚集预警",
+
+        badge:"校园模式"
+
+    },
+
+    factory:{
+
+        title:"工厂安全监控",
+
+        desc:"危险区域入侵检测",
+
+        badge:"工厂模式"
+
+    },
+
+    parking:{
+
+        title:"停车场系统",
+
+        desc:"车辆检测",
+
+        badge:"停车场模式"
+
+    },
+
+    warehouse:{
+
+        title:"仓库监控",
+
+        desc:"人员异常停留 · 区域防护",
+
+        badge:"仓库模式"
+
+    },
+
+    home:{
+
+        title:"家庭安防白名单系统",
+
+        desc:"人脸白名单 · 陌生人入侵报警",
+
+        badge:"家庭模式"
+
+    }
+
+};
+
+
+// ======================
+// 模式切换核心
+// ======================
+
+function changeScene(mode){
+
+    currentScene = mode;
+
+    let info=scenes[mode];
+
+    if(info){
+
+        document.getElementById("sceneTitle").innerText =
+            info.title;
+
+        document.getElementById("sceneDesc").innerText =
+            info.desc;
+
+        document.getElementById("sceneBadge").innerText =
+            "当前模式："+info.badge;
+
+    }
+
+    fetch("/set_mode/"+mode);
+
+    if(mode === "home"){
+
+        document.getElementById("faceTip").innerText =
+            "当前为家庭模式：请让授权人员正对摄像头，然后点击“录入家庭白名单”。";
+
+    }else{
+
+        document.getElementById("faceTip").innerText =
+            "家庭模式下，点击按钮可将当前摄像头画面中的人脸录入白名单。";
+
+    }
+
+}
+
+
+// ======================
+// 家庭模式：录入白名单人脸
+// ======================
+
+function registerFace(){
+
+    if(currentScene !== "home"){
+
+        alert("请先切换到家庭模式，再录入白名单人脸");
+
+        return;
+
+    }
+
+    let name = prompt("请输入白名单人员名称，例如：family_1");
+
+    if(!name){
+
+        name = "whitelist_user";
+
+    }
+
+    document.getElementById("faceTip").innerText =
+        "正在录入白名单，请保持人脸正对摄像头...";
+
+    fetch("/register_face", {
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+            name:name
+        })
+
+    })
+
+    .then(r=>r.json())
+
+    .then(data=>{
+
+        if(data.status === "ok"){
+
+            document.getElementById("faceTip").innerText =
+                "✅ 白名单录入成功：" + name;
+
+            addEvent(
+                "白名单录入成功：" + name
+            );
+
+            alert("白名单录入成功：" + name);
+
+        }
+
+        else{
+
+            document.getElementById("faceTip").innerText =
+                "❌ 白名单录入失败：" + (data.message || "未检测到人脸");
+
+            addEvent(
+                "白名单录入失败"
+            );
+
+            alert("白名单录入失败：" + (data.message || "未检测到人脸"));
+
+        }
+
+    })
+
+    .catch(err=>{
+
+        document.getElementById("faceTip").innerText =
+            "❌ 请求失败，请检查 app.py 和 camera.py 是否已经加入白名单接口";
+
+        alert("请求失败，请检查 app.py 和 camera.py 是否已经加入白名单接口");
+
+    });
+
+}
+
+
+// ======================
+// 全屏
+// ======================
+
+let isFullscreen=false;
+
+document
+.getElementById("fullscreenBtn")
+.addEventListener(
+"click",
+function(){
+
+    const layout=document.querySelector(".layout");
+
+    isFullscreen=!isFullscreen;
+
+    if(isFullscreen){
+
+        layout.classList.add(
+            "fullscreen-mode"
+        );
+
+        this.innerHTML="✕ 退出";
+
+    }
+
+    else{
+
+        layout.classList.remove(
+            "fullscreen-mode"
+        );
+
+        this.innerHTML="⛶ 全屏";
+
+    }
+
+});
+
+
+// ======================
+// 事件记录
+// ======================
+
+function addEvent(text){
+
+    let list=document.getElementById(
+        "eventList"
+    );
+
+    let li=document.createElement(
+        "li"
+    );
+
+    li.innerHTML =
+        new Date().toLocaleTimeString()
+        +
+        " · "
+        +
+        text;
+
+    list.prepend(li);
+
+    if(list.children.length>6){
+
+        list.removeChild(
+            list.lastChild
+        );
+
+    }
+
+}
+
+
+// ======================
+// 状态刷新
+// ======================
+
+function updateStatus(){
+
+    fetch("/status")
+
+    .then(r=>r.json())
+
+    .then(data=>{
+
+        document.getElementById("people").innerText =
+            data.people;
+
+        document.getElementById("alarm").innerText =
+            data.alarm_level || "LOW";
+
+        document.getElementById("inCount").innerText =
+            data.in_count || 0;
+
+        document.getElementById("outCount").innerText =
+            data.out_count || 0;
+
+        document.getElementById("system").innerText =
+            data.system;
+
+        document.getElementById("system2").innerText =
+            data.system;
+
+        let box=document.getElementById(
+            "alertBox"
+        );
+
+        if(data.stranger){
+
+            box.innerText="🚨 家庭陌生人报警";
+
+            box.className="alert-box danger";
+
+            addEvent(
+                "家庭陌生人报警"
+            );
+
+        }
+
+        else if(data.intrusion){
+
+            box.innerText="🚨 入侵报警";
+
+            box.className="alert-box danger";
+
+            addEvent(
+                "入侵报警"
+            );
+
+        }
+
+        else if(data.crowd){
+
+            box.innerText="⚠ 人员聚集";
+
+            box.className="alert-box warning";
+
+            addEvent(
+                "聚集报警"
+            );
+
+        }
+
+        else if(data.loitering){
+
+            box.innerText="⚠ 仓库人员异常";
+
+            box.className="alert-box warning";
+
+            addEvent(
+                "仓库人员异常"
+            );
+
+        }
+
+        else{
+
+            box.innerText="✅ 系统正常";
+
+            box.className="alert-box";
+
+        }
+
+    });
+
+}
+
+
+setInterval(
+    updateClock,
+    1000
+);
+
+setInterval(
+    updateStatus,
+    1000
+);
+
+updateClock();
+
+updateStatus();
+
+</script>
+
+</body>
+
+</html>

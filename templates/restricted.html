@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>禁区模式 - EdgeVision</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<div class="topbar">
+    <div class="brand">
+        <div class="brand-icon">🚨</div>
+        <div>
+            <div class="brand-title">禁区入侵检测模式</div>
+            <div class="brand-subtitle">Restricted Area · Intrusion Detection · Auto Alarm</div>
+        </div>
+    </div>
+
+    <div class="top-right">
+        <span>ONLINE</span>
+        <a href="/dashboard">返回控制台</a>
+    </div>
+</div>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <a href="/dashboard">🏠 控制中心</a>
+        <a href="/mall">🏬 商场模式</a>
+        <a class="active" href="/restricted">🚨 禁区模式</a>
+        <a href="/campus">🏫 校园模式</a>
+        <a href="/factory">🏭 工厂模式</a>
+        <a href="/parking">🚗 停车场</a>
+        <a href="/warehouse">📦 仓库模式</a>
+        <a href="/home">🏠 家庭模式</a>
+    </aside>
+
+    <main class="main">
+
+        <section class="hero">
+            <div>
+                <h1>🚨 禁区入侵检测中心</h1>
+                <p>区域入侵检测、报警等级判断、事件截图、报警记录与后续联动扩展</p>
+            </div>
+            <div class="mode-badge">当前模式：禁区</div>
+        </section>
+
+        <section class="dashboard-grid">
+
+            <div class="video-panel">
+                <div class="panel-title">
+                    <h2>禁区实时监控</h2>
+                    <span>LIVE CAMERA</span>
+                </div>
+
+                <div class="video-shell">
+                    <img src="/video" class="video">
+                </div>
+            </div>
+
+            <div class="side-panel">
+                <div class="panel-title">
+                    <h2>禁区模式功能</h2>
+                    <span>RESTRICTED AI MODULES</span>
+                </div>
+
+                <div class="info-list">
+                    <div><span>当前场景</span><b>禁区防护</b></div>
+                    <div><span>检测模型</span><b>YOLO11n + ByteTrack</b></div>
+                    <div><span>核心功能</span><b>ROI入侵检测</b></div>
+                    <div><span>报警方式</span><b>Web报警 / 截图</b></div>
+                    <div><span>系统状态</span><b>ONLINE</b></div>
+                </div>
+
+                <div class="alert-box danger">
+                    🚨 禁区防护模式已启用
+                </div>
+
+                <div class="event-box">
+                    <h3>功能说明</h3>
+                    <ul>
+                        <li>检测人员是否进入禁区ROI</li>
+                        <li>入侵后自动切换 HIGH 报警等级</li>
+                        <li>自动写入事件数据库</li>
+                        <li>自动保存事件截图</li>
+                    </ul>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+</body>
+</html>

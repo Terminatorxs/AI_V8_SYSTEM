@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AI Security V11</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #0f0f0f;
+            color: white;
+            font-family: Arial;
+            display: flex;
+        }
+
+        #left {
+            width: 70%;
+            padding: 10px;
+        }
+
+        #right {
+            width: 30%;
+            background: #1c1c1c;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .event {
+            background: #333;
+            padding: 10px;
+            margin: 8px 0;
+            border-left: 4px solid red;
+        }
+
+        h2 {
+            color: #00ff99;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="left">
+    <h2>🎥 Live Camera</h2>
+    <img src="/video">
+</div>
+
+<div id="right">
+    <h2>🚨 Event Panel</h2>
+    <div id="events"></div>
+</div>
+
+<script>
+function loadEvents(){
+    fetch('/events')
+    .then(res => res.json())
+    .then(data => {
+        let box = document.getElementById("events");
+        box.innerHTML = "";
+
+        data.reverse().forEach(e => {
+            let div = document.createElement("div");
+            div.className = "event";
+            div.innerHTML = e;
+            box.appendChild(div);
+        });
+    });
+}
+
+setInterval(loadEvents, 1000);
+</script>
+
+</body>
+</html>
